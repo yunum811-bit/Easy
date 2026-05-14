@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - จัดการคำขอใช้บริการ | AccPro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-header">
+                <span class="logo-icon">📊</span>
+                <h1>AccPro Admin</h1>
+                <p>เข้าสู่ระบบจัดการ</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">ชื่อผู้ใช้</label>
+                    <input type="text" id="loginUsername" required placeholder="Username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">รหัสผ่าน</label>
+                    <input type="password" id="loginPassword" required placeholder="Password" autocomplete="current-password">
+                </div>
+                <div class="login-error" id="loginError" style="display:none;">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+                <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
+            </form>
+            <p class="login-hint">ค่าเริ่มต้น: admin / admin1234</p>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" style="display:none;">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <span class="logo-icon">📊</span>
+                <span class="logo-text">AccPro</span>
+            </a>
+            <span class="badge-admin">Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">📈</span>
+                <span>แดชบอร์ด</span>
+            </a>
+            <a href="#" class="nav-item" data-page="requests">
+                <span class="nav-icon">📋</span>
+                <span>คำขอใช้บริการ</span>
+                <span class="nav-badge" id="pendingCount">0</span>
+            </a>
+            <a href="#" class="nav-item" data-page="completed">
+                <span class="nav-icon">✅</span>
+                <span>ดำเนินการแล้ว</span>
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+                <span class="nav-icon">⚙️</span>
+                <span>ตั้งค่าข้อมูลติดต่อ</span>
+            </a>
+            <a href="#" class="nav-item" data-page="content">
+                <span class="nav-icon">✏️</span>
+                <span>จัดการเนื้อหาเว็บ</span>
+            </a>
+            <a href="index.html" class="nav-item">
+                <span class="nav-icon">🌐</span>
+                <span>กลับหน้าเว็บ</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" style="display:none;">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h1 class="page-title" id="pageTitle">แดชบอร์ด</h1>
+            <div class="topbar-right">
+                <span class="admin-name">👤 ผู้ดูแลระบบ</span>
+                <button class="btn-logout" onclick="logout()">ออกจากระบบ</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Page -->
+        <section class="page active" id="page-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📩</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statTotal">0</span>
+                        <span class="stat-label">คำขอทั้งหมด</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">⏳</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statPending">0</span>
+                        <span class="stat-label">รอดำเนินการ</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">🔄</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statInProgress">0</span>
+                        <span class="stat-label">กำลังดำเนินการ</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">✅</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statCompleted">0</span>
+                        <span class="stat-label">เสร็จสิ้น</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>คำขอล่าสุด</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ชื่อ</th>
+                                <th>บริการ</th>
+                                <th>สถานะ</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Requests Page -->
+        <section class="page" id="page-requests">
+            <div class="card">
+                <div class="card-header">
+                    <h2>คำขอใช้บริการ - รอดำเนินการ</h2>
+                    <div class="card-actions">
+                        <select id="filterService" class="filter-select">
+                            <option value="">ทุกบริการ</option>
+                            <option value="monthly">ทำบัญชีรายเดือน</option>
+                            <option value="tax">ยื่นภาษี</option>
+                            <option value="closing">ปิดงบการเงิน</option>
+                            <option value="audit">ตรวจสอบบัญชี</option>
+                            <option value="register">จดทะเบียนบริษัท</option>
+                            <option value="system">วางระบบบัญชี</option>
+                            <option value="other">อื่นๆ</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ชื่อ</th>
+                                <th>เบอร์โทร</th>
+                                <th>อีเมล</th>
+                                <th>บริการ</th>
+                                <th>สถานะ</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyRequests" style="display:none;">
+                    <span class="empty-icon">📭</span>
+                    <p>ไม่มีคำขอที่รอดำเนินการ</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Completed Page -->
+        <section class="page" id="page-completed">
+            <div class="card">
+                <div class="card-header">
+                    <h2>ดำเนินการแล้ว</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ชื่อ</th>
+                                <th>เบอร์โทร</th>
+                                <th>อีเมล</th>
+                                <th>บริการ</th>
+                                <th>สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="completedTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyCompleted" style="display:none;">
+                    <span class="empty-icon">📭</span>
+                    <p>ยังไม่มีรายการที่ดำเนินการแล้ว</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Page -->
+        <section class="page" id="page-settings">
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚙️ แก้ไขข้อมูลติดต่อ</h2>
+                </div>
+                <div class="settings-body">
+                    <form id="contactSettingsForm">
+                        <div class="settings-section">
+                            <h3>📍 ที่อยู่</h3>
+                            <div class="form-group">
+                                <label for="settingAddress1">ที่อยู่ บรรทัดที่ 1</label>
+                                <input type="text" id="settingAddress1" placeholder="เช่น 123 อาคารสำนักงาน ชั้น 5">
+                            </div>
+                            <div class="form-group">
+                                <label for="settingAddress2">ที่อยู่ บรรทัดที่ 2</label>
+                                <input type="text" id="settingAddress2" placeholder="เช่น ถนนสุขุมวิท แขวงคลองเตย">
+                            </div>
+                            <div class="form-group">
+                                <label for="settingAddress3">ที่อยู่ บรรทัดที่ 3</label>
+                                <input type="text" id="settingAddress3" placeholder="เช่น เขตคลองเตย กรุงเทพฯ 10110">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>📞 โทรศัพท์</h3>
+                            <div class="form-group">
+                                <label for="settingPhone1">เบอร์โทร 1</label>
+                                <input type="tel" id="settingPhone1" placeholder="02-xxx-xxxx">
+                            </div>
+                            <div class="form-group">
+                                <label for="settingPhone2">เบอร์โทร 2 (มือถือ)</label>
+                                <input type="tel" id="settingPhone2" placeholder="08x-xxx-xxxx">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>✉️ อีเมล</h3>
+                            <div class="form-group">
+                                <label for="settingEmail">อีเมลติดต่อ</label>
+                                <input type="email" id="settingEmail" placeholder="info@accpro.co.th">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>⏰ เวลาทำการ</h3>
+                            <div class="form-group">
+                                <label for="settingHours1">จันทร์ - ศุกร์</label>
+                                <input type="text" id="settingHours1" placeholder="9:00 - 18:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="settingHours2">เสาร์</label>
+                                <input type="text" id="settingHours2" placeholder="9:00 - 12:00">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>🌐 โซเชียลมีเดีย</h3>
+                            <div class="form-group">
+                                <label for="settingFacebook">Facebook URL</label>
+                                <input type="url" id="settingFacebook" placeholder="https://facebook.com/accpro">
+                            </div>
+                            <div class="form-group">
+                                <label for="settingLine">Line ID</label>
+                                <input type="text" id="settingLine" placeholder="@accpro">
+                            </div>
+                            <div class="form-group">
+                                <label for="settingInstagram">Instagram URL</label>
+                                <input type="url" id="settingInstagram" placeholder="https://instagram.com/accpro">
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save">💾 บันทึกข้อมูล</button>
+                            <button type="button" class="btn-preview" onclick="previewContact()">👁️ ดูตัวอย่าง</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="card" id="previewCard" style="margin-top:24px; display:none;">
+                <div class="card-header">
+                    <h2>👁️ ตัวอย่างที่จะแสดงในหน้าเว็บ</h2>
+                </div>
+                <div class="settings-body">
+                    <div class="preview-contact" id="previewContent"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Management Page -->
+        <section class="page" id="page-content">
+            <!-- Hero Section Editor -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h2>🏠 หมวด Hero (แบนเนอร์หลัก)</h2>
+                    <button class="action-btn btn-toggle-edit" onclick="toggleSection('hero')">✏️ แก้ไข</button>
+                </div>
+                <div class="settings-body content-editor" id="editor-hero" style="display:none;">
+                    <div class="form-group">
+                        <label for="heroTitle">หัวข้อหลัก</label>
+                        <input type="text" id="heroTitle" placeholder="บริการรับทำบัญชี ครบวงจร มืออาชีพ">
+                    </div>
+                    <div class="form-group">
+                        <label for="heroSubtitle">คำอธิบาย</label>
+                        <textarea id="heroSubtitle" rows="3" placeholder="ดูแลงานบัญชีของคุณอย่างมืออาชีพ..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="heroStat1Num">สถิติ 1 - ตัวเลข</label>
+                            <input type="text" id="heroStat1Num" placeholder="500+">
+                        </div>
+                        <div class="form-group">
+                            <label for="heroStat1Label">สถิติ 1 - คำอธิบาย</label>
+                            <input type="text" id="heroStat1Label" placeholder="ลูกค้าที่ไว้วางใจ">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="heroStat2Num">สถิติ 2 - ตัวเลข</label>
+                            <input type="text" id="heroStat2Num" placeholder="15+">
+                        </div>
+                        <div class="form-group">
+                            <label for="heroStat2Label">สถิติ 2 - คำอธิบาย</label>
+                            <input type="text" id="heroStat2Label" placeholder="ปีประสบการณ์">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="heroStat3Num">สถิติ 3 - ตัวเลข</label>
+                            <input type="text" id="heroStat3Num" placeholder="100%">
+                        </div>
+                        <div class="form-group">
+                            <label for="heroStat3Label">สถิติ 3 - คำอธิบาย</label>
+                            <input type="text" id="heroStat3Label" placeholder="ถูกต้องตามกฎหมาย">
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button type="button" class="btn-save" onclick="saveContentSection('hero')">💾 บันทึก</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Section Editor -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h2>📒 หมวดบริการ</h2>
+                    <button class="action-btn btn-toggle-edit" onclick="toggleSection('services')">✏️ แก้ไข</button>
+                </div>
+                <div class="settings-body content-editor" id="editor-services" style="display:none;">
+                    <div class="form-group">
+                        <label for="servicesSectionTitle">หัวข้อหมวด</label>
+                        <input type="text" id="servicesSectionTitle" placeholder="บริการของเรา">
+                    </div>
+                    <div class="form-group">
+                        <label for="servicesSectionDesc">คำอธิบายหมวด</label>
+                        <input type="text" id="servicesSectionDesc" placeholder="เราให้บริการด้านบัญชีครบวงจร...">
+                    </div>
+                    <hr class="section-divider">
+                    <div id="servicesEditorList"></div>
+                    <div class="settings-actions">
+                        <button type="button" class="btn-save" onclick="saveContentSection('services')">💾 บันทึก</button>
+                        <button type="button" class="btn-preview" onclick="addServiceItem()">➕ เพิ่มบริการ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Us Section Editor -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h2>⭐ หมวดทำไมเลือกเรา</h2>
+                    <button class="action-btn btn-toggle-edit" onclick="toggleSection('whyus')">✏️ แก้ไข</button>
+                </div>
+                <div class="settings-body content-editor" id="editor-whyus" style="display:none;">
+                    <div class="form-group">
+                        <label for="whyusSectionTitle">หัวข้อหมวด</label>
+                        <input type="text" id="whyusSectionTitle" placeholder="ทำไมต้องเลือกเรา">
+                    </div>
+                    <div class="form-group">
+                        <label for="whyusSectionDesc">คำอธิบายหมวด</label>
+                        <input type="text" id="whyusSectionDesc" placeholder="เราพร้อมดูแลงานบัญชีของคุณ...">
+                    </div>
+                    <hr class="section-divider">
+                    <div id="whyusEditorList"></div>
+                    <div class="settings-actions">
+                        <button type="button" class="btn-save" onclick="saveContentSection('whyus')">💾 บันทึก</button>
+                        <button type="button" class="btn-preview" onclick="addWhyUsItem()">➕ เพิ่มเหตุผล</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Section Editor -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h2>💰 หมวดแพ็กเกจราคา</h2>
+                    <button class="action-btn btn-toggle-edit" onclick="toggleSection('pricing')">✏️ แก้ไข</button>
+                </div>
+                <div class="settings-body content-editor" id="editor-pricing" style="display:none;">
+                    <div class="form-group">
+                        <label for="pricingSectionTitle">หัวข้อหมวด</label>
+                        <input type="text" id="pricingSectionTitle" placeholder="แพ็กเกจราคา">
+                    </div>
+                    <div class="form-group">
+                        <label for="pricingSectionDesc">คำอธิบายหมวด</label>
+                        <input type="text" id="pricingSectionDesc" placeholder="เลือกแพ็กเกจที่เหมาะกับธุรกิจของคุณ">
+                    </div>
+                    <hr class="section-divider">
+                    <div id="pricingEditorList"></div>
+                    <div class="settings-actions">
+                        <button type="button" class="btn-save" onclick="saveContentSection('pricing')">💾 บันทึก</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>รายละเอียดคำขอ</h3>
+                <button class="modal-close" id="modalClose" aria-label="ปิด">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+            <div class="modal-footer" id="modalFooter">
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Modal -->
+    <div class="modal-overlay" id="replyModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✉️ ตอบกลับลูกค้า</h3>
+                <button class="modal-close" id="replyModalClose" aria-label="ปิด">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="reply-recipient" id="replyRecipient"></div>
+                <form id="replyForm">
+                    <div class="form-group">
+                        <label for="replySubject">หัวข้อ</label>
+                        <input type="text" id="replySubject" required placeholder="หัวข้ออีเมล">
+                    </div>
+                    <div class="form-group">
+                        <label for="replyMessage">ข้อความ</label>
+                        <textarea id="replyMessage" rows="6" required placeholder="พิมพ์ข้อความตอบกลับลูกค้า..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-send" id="btnSendReply">
+                        <span class="btn-send-text">📧 ส่งอีเมลตอบกลับ</span>
+                        <span class="btn-send-loading" style="display:none;">⏳ กำลังส่ง...</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Sent History Modal -->
+    <div class="modal-overlay" id="historyModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📨 ประวัติการตอบกลับ</h3>
+                <button class="modal-close" id="historyModalClose" aria-label="ปิด">&times;</button>
+            </div>
+            <div class="modal-body" id="historyModalBody">
+            </div>
+        </div>
+    </div>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
