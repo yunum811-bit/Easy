@@ -989,3 +989,119 @@ body {
         gap: 0;
     }
 }
+
+
+/* Branding Settings */
+.logo-upload-area {
+    background: var(--gray-50);
+    border: 2px dashed var(--gray-300);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+}
+
+.logo-preview {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 16px;
+    border-radius: 12px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.logo-placeholder {
+    font-size: 3rem;
+}
+
+.logo-upload-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.btn-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--primary);
+    color: var(--white);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-upload:hover {
+    background: var(--primary-dark);
+}
+
+.btn-remove-logo {
+    padding: 10px 20px;
+    background: var(--red-light);
+    color: #991b1b;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-remove-logo:hover {
+    background: var(--red);
+    color: var(--white);
+}
+
+.form-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* Branding Preview */
+.branding-preview {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.branding-preview-navbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--secondary);
+    padding: 14px 20px;
+    border-radius: 8px;
+}
+
+.branding-preview-logo {
+    font-size: 1.5rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+}
+
+.branding-preview-logo img {
+    border-radius: 4px;
+}
+
+.branding-preview-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--white);
+}

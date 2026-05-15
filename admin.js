@@ -91,6 +91,7 @@ const pageTitles = {
     dashboard: 'แดชบอร์ด',
     requests: 'คำขอใช้บริการ',
     completed: 'ดำเนินการแล้ว',
+    branding: 'ตั้งค่าแบรนด์บริษัท',
     settings: 'ตั้งค่าข้อมูลติดต่อ',
     content: 'จัดการเนื้อหาเว็บ'
 };
@@ -936,3 +937,158 @@ function saveContentSection(section) {
     saveContent(content);
     showNotification('บันทึกเนื้อหาเรียบร้อยแล้ว ✅ รีเฟรชหน้าเว็บเพื่อดูผลลัพธ์');
 }
+
+
+// ============================================================
+// Branding Settings (Company Name & Logo)
+// ============================================================
+
+const defaultBranding = {
+    companyName: 'AccPro',
+    logoImage: '',  // base64 encoded image
+    logoEmoji: '📊'
+};
+
+function getBranding() {
+    const data = localStorage.getItem('accpro_branding');
+    return data ? JSON.parse(data) : defaultBranding;
+}
+
+function saveBranding(branding) {
+    localStorage.setItem('accpro_branding', JSON.stringify(branding));
+}
+
+// Load branding into form
+function loadBrandingForm() {
+    const branding = getBranding();
+    document.getElementById('settingCompanyName').value = branding.companyName || 'AccPro';
+
+    // Show logo preview
+    updateLogoPreview(branding);
+    updateBrandPreview(branding);
+}
+
+function updateLogoPreview(branding) {
+    const previewImg = document.getElementById('logoPreviewImg');
+    const placeholder = document.getElementById('logoPlaceholder');
+    const removeBtn = document.getElementById('btnRemoveLogo');
+
+    if (branding.logoImage) {
+        previewImg.src = branding.logoImage;
+        previewImg.style.display = 'block';
+        placeholder.style.display = 'none';
+        removeBtn.style.display = 'inline-block';
+    } else {
+        previewImg.style.display = 'none';
+        placeholder.style.display = 'block';
+        placeholder.textContent = branding.logoEmoji || '📊';
+        removeBtn.style.display = 'none';
+    }
+}
+
+function updateBrandPreview(branding) {
+    const previewLogo = document.getElementById('brandPreviewLogo');
+    const previewName = document.getElementById('brandPreviewName');
+
+    if (branding.logoImage) {
+        previewLogo.innerHTML = `<img src="${branding.logoImage}" alt="Logo" style="width:32px;height:32px;object-fit:contain;">`;
+    } else {
+        previewLogo.textContent = branding.logoEmoji || '📊';
+    }
+    previewName.textContent = branding.companyName || 'AccPro';
+}
+
+// Handle logo file upload
+document.getElementById('settingLogo').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file size (max 500KB)
+    if (file.size > 500 * 1024) {
+        showNotification('ไฟล์ใหญ่เกินไป กรุณาเลือกไฟล์ขนาดไม่เกิน 500KB', 'error');
+        return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        showNotification('รองรับเฉพาะไฟล์ PNG, JPG, SVG, WebP เท่านั้น', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const base64 = event.target.result;
+        const branding = getBranding();
+        branding.logoImage = base64;
+        updateLogoPreview(branding);
+        updateBrandPreview(branding);
+    };
+    reader.readAsDataURL(file);
+});
+
+// Remove logo
+document.getElementById('btnRemoveLogo').addEventListener('click', function() {
+    const branding = getBranding();
+    branding.logoImage = '';
+    updateLogoPreview(branding);
+    updateBrandPreview(branding);
+    document.getElementById('settingLogo').value = '';
+});
+
+// Save branding form
+document.getElementById('brandingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const companyName = document.getElementById('settingCompanyName').value.trim();
+    if (!companyName) {
+        showNotification('กรุณากรอกชื่อบริษัท', 'error');
+        return;
+    }
+
+    const branding = getBranding();
+    branding.companyName = companyName;
+
+    // Check if there's a new logo uploaded (from preview img)
+    const previewImg = document.getElementById('logoPreviewImg');
+    if (previewImg.style.display !== 'none' && previewImg.src) {
+        branding.logoImage = previewImg.src;
+    } else if (document.getElementById('logoPlaceholder').style.display !== 'none') {
+        branding.logoImage = '';
+    }
+
+    saveBranding(branding);
+
+    // Update admin page logos immediately
+    applyBrandingToAdmin(branding);
+
+    showNotification('บันทึกแบรนด์เรียบร้อยแล้ว ✅ รีเฟรชหน้าเว็บหลักเพื่อดูผลลัพธ์');
+});
+
+// Apply branding to admin panel
+function applyBrandingToAdmin(branding) {
+    const logoElements = document.querySelectorAll('.sidebar .logo .logo-text');
+    logoElements.forEach(el => {
+        el.textContent = branding.companyName || 'AccPro';
+    });
+
+    const logoIcons = document.querySelectorAll('.sidebar .logo .logo-icon');
+    logoIcons.forEach(el => {
+        if (branding.logoImage) {
+            el.innerHTML = `<img src="${branding.logoImage}" alt="Logo" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;">`;
+        } else {
+            el.textContent = branding.logoEmoji || '📊';
+        }
+    });
+}
+
+// Live preview on name change
+document.getElementById('settingCompanyName').addEventListener('input', function() {
+    const branding = getBranding();
+    branding.companyName = this.value || 'AccPro';
+    updateBrandPreview(branding);
+});
+
+// Load branding on page load
+loadBrandingForm();
+applyBrandingToAdmin(getBranding());

@@ -111,6 +111,40 @@ function loadContactInfo() {
 
 loadContactInfo();
 
+// Load branding (company name & logo) from localStorage
+function loadBranding() {
+    const data = localStorage.getItem('accpro_branding');
+    if (!data) return;
+
+    const branding = JSON.parse(data);
+
+    // Update all logo text elements
+    if (branding.companyName) {
+        document.querySelectorAll('.logo-text').forEach(el => {
+            el.textContent = branding.companyName;
+        });
+        // Update page title
+        const titleEl = document.querySelector('title');
+        if (titleEl) {
+            titleEl.textContent = titleEl.textContent.replace('AccPro', branding.companyName);
+        }
+        // Update footer copyright
+        const footerBottom = document.querySelector('.footer-bottom p');
+        if (footerBottom) {
+            footerBottom.innerHTML = footerBottom.innerHTML.replace('AccPro', branding.companyName);
+        }
+    }
+
+    // Update logo icon with image or keep emoji
+    if (branding.logoImage) {
+        document.querySelectorAll('.logo-icon').forEach(el => {
+            el.innerHTML = `<img src="${branding.logoImage}" alt="Logo" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;">`;
+        });
+    }
+}
+
+loadBranding();
+
 // Load website content from localStorage (set by admin panel)
 function loadWebContent() {
     const data = localStorage.getItem('accpro_content');

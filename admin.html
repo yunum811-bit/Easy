@@ -57,6 +57,10 @@
                 <span class="nav-icon">✅</span>
                 <span>ดำเนินการแล้ว</span>
             </a>
+            <a href="#" class="nav-item" data-page="branding">
+                <span class="nav-icon">🏷️</span>
+                <span>ตั้งค่าแบรนด์</span>
+            </a>
             <a href="#" class="nav-item" data-page="settings">
                 <span class="nav-icon">⚙️</span>
                 <span>ตั้งค่าข้อมูลติดต่อ</span>
@@ -210,6 +214,60 @@
                 <div class="empty-state" id="emptyCompleted" style="display:none;">
                     <span class="empty-icon">📭</span>
                     <p>ยังไม่มีรายการที่ดำเนินการแล้ว</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Branding Page -->
+        <section class="page" id="page-branding">
+            <div class="card">
+                <div class="card-header">
+                    <h2>🏷️ ตั้งค่าแบรนด์บริษัท</h2>
+                </div>
+                <div class="settings-body">
+                    <form id="brandingForm">
+                        <div class="settings-section">
+                            <h3>🏢 ชื่อบริษัท</h3>
+                            <div class="form-group">
+                                <label for="settingCompanyName">ชื่อบริษัท (แสดงเป็นโลโก้ข้อความ)</label>
+                                <input type="text" id="settingCompanyName" placeholder="AccPro">
+                                <small class="form-hint">ชื่อนี้จะแสดงที่ Navbar, Footer และหน้า Admin</small>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>🖼️ โลโก้บริษัท</h3>
+                            <div class="form-group">
+                                <label for="settingLogo">อัปโหลดโลโก้ (แนะนำขนาดไม่เกิน 200x200px, PNG/JPG/SVG)</label>
+                                <div class="logo-upload-area" id="logoUploadArea">
+                                    <div class="logo-preview" id="logoPreview">
+                                        <span class="logo-placeholder" id="logoPlaceholder">📊</span>
+                                        <img id="logoPreviewImg" src="" alt="Logo preview" style="display:none;">
+                                    </div>
+                                    <div class="logo-upload-actions">
+                                        <label for="settingLogo" class="btn-upload">📁 เลือกไฟล์</label>
+                                        <input type="file" id="settingLogo" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;">
+                                        <button type="button" class="btn-remove-logo" id="btnRemoveLogo" style="display:none;">🗑️ ลบโลโก้</button>
+                                    </div>
+                                    <small class="form-hint">รองรับ PNG, JPG, SVG, WebP (ขนาดไม่เกิน 500KB)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>👁️ ตัวอย่าง</h3>
+                            <div class="branding-preview">
+                                <div class="branding-preview-navbar">
+                                    <span class="branding-preview-logo" id="brandPreviewLogo">📊</span>
+                                    <span class="branding-preview-name" id="brandPreviewName">AccPro</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save">💾 บันทึกแบรนด์</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
